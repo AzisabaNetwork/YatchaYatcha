@@ -12,6 +12,7 @@ public class YYConfigUtil {
 	public static final String RULE_KEY = "rule";
 	public static final String BID_MIN_PRICE_MULTI = "bid-min-price-multi";
 	public static final String BID_MIN_PRICE_AD = "bid-min-price-add";
+	public static final String LUNACHAT_AUCTION_CHANNEL = "lc-auction-channel";
 
 	/**
 	 * カウントダウン秒数を取得
@@ -43,5 +44,13 @@ public class YYConfigUtil {
 	 */
 	public static int getBidMinPriceAdd() {
 		return YatchaYatcha.getInstance().getConfig().getInt(BID_MIN_PRICE_AD);
+	}
+
+	/**
+	 * LunaChatのオークションチャンネル名を取得
+	 * @return チャンネル名(String)
+	 */
+	public static String getLunaChatAuctionChannel() {
+		return YatchaYatcha.getInstance().getConfig().getString(LUNACHAT_AUCTION_CHANNEL);
 	}
 }

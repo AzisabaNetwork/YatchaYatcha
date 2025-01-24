@@ -10,6 +10,7 @@ import com.github.aburaagearou.yatchayatcha.log.AuctionInfo;
 import com.github.aburaagearou.yatchayatcha.log.FileLogger;
 import com.github.aburaagearou.yatchayatcha.log.IAuctionLogger;
 import com.github.aburaagearou.yatchayatcha.log.MemoryLogger;
+import com.github.ucchyocean.lc.channel.Channel;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,6 +40,9 @@ public final class YatchaYatcha extends JavaPlugin {
     private static final MemoryLogger memoryLogger = new MemoryLogger();
     private static final FileLogger fileLogger = new FileLogger();
     private static final IAuctionLogger[] loggers = {memoryLogger, fileLogger};
+
+    // 連携フラグ
+    private static boolean lunaChat = false;
 
     /**
      * プラグイン有効化処理
@@ -78,6 +82,14 @@ public final class YatchaYatcha extends JavaPlugin {
             sender.sendMessage(MessageType.ERROR, MessageKeys.ERROR_GENERIC_LOGGED);
             return true;
         }), true);
+
+        // LunaChat連携
+        if(getServer().getPluginManager().getPlugin("LunaChat") != null) {
+            if(!YYConfigUtil.getLunaChatAuctionChannel().isEmpty()) {
+                lunaChat = true;
+                getLogger().info("LunaChatとの連携が有効になりました。");
+            }
+        }
 
         getLogger().info("YatchaYatchaを有効化しました。");
     }
@@ -135,5 +147,13 @@ public final class YatchaYatcha extends JavaPlugin {
         for (IAuctionLogger logger : loggers) {
             logger.log(info);
         }
+    }
+
+    /**
+     * LunaChat連携が有効かどうか
+     * @return 有効ならtrue
+     */
+    public static boolean isLunaChatEnabled() {
+        return lunaChat;
     }
 }

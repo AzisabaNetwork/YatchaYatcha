@@ -93,7 +93,7 @@ public class AdminAuction {
 		Utilities.broadcastColoredMessage("&r");
 		Utilities.broadcastColoredMessage("&c&m-----&c&l&n 運営オークションが開始されました &c&m-----");
 		Utilities.broadcastColoredMessage("&r");
-		Bukkit.broadcast(itemNameText);
+		Utilities.broadcastColoredMessage(itemNameText);
 		Utilities.broadcastColoredMessage("&d&l開始価格： &e$" + bidPrice);
 		Utilities.broadcastColoredMessage("&r");
 		Utilities.broadcastColoredMessage("&e&l&n/bid (値段)&f コマンドで入札できます。");
@@ -153,7 +153,7 @@ public class AdminAuction {
 		TextComponent itemNameText =
 				LegacyComponentSerializer.legacyAmpersand().deserialize("出品物  ： &r&f").append(itemName)
 						.hoverEvent(HoverEvent.showText(itemInfo));
-		Bukkit.broadcast(itemNameText.asComponent());
+		Utilities.broadcastColoredMessage(itemNameText.asComponent());
 		if(bidPlayer != null) {
 			Utilities.broadcastColoredMessage("&d&l落札者  ： &e" + bidPlayer.getName());
 			Utilities.broadcastColoredMessage("&d&l落札価格： &e$" + bidPrice);
