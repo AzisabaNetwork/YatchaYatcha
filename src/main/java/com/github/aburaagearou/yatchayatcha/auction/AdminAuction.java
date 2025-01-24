@@ -158,12 +158,12 @@ public class AdminAuction {
 			}
 			else {
 				if(!isDebug) {
-					Utilities.broadcastColoredMessage("&r");
-					Utilities.broadcastColoredMessage("&e※デバッグモードのため景品、費用の収受は行われません。");
-				}
-				else {
 					YatchaYatcha.getEconomy().withdrawPlayer(bidPlayer, bidPrice);
 					bidPlayer.getInventory().addItem(item);
+				}
+				else {
+					Utilities.broadcastColoredMessage("&r");
+					Utilities.broadcastColoredMessage("&e※デバッグモードのため景品、費用の収受は行われません。");
 				}
 			}
 		}
