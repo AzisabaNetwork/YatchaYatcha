@@ -6,6 +6,10 @@ import co.aikar.commands.MessageType;
 import co.aikar.commands.PaperCommandManager;
 import com.github.aburaagearou.yatchayatcha.commands.AdminAuctionCommand;
 import com.github.aburaagearou.yatchayatcha.commands.BidCommand;
+import com.github.aburaagearou.yatchayatcha.log.AuctionInfo;
+import com.github.aburaagearou.yatchayatcha.log.FileLogger;
+import com.github.aburaagearou.yatchayatcha.log.IAuctionLogger;
+import com.github.aburaagearou.yatchayatcha.log.MemoryLogger;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +34,11 @@ public final class YatchaYatcha extends JavaPlugin {
 
     // EconomyAPI
     private static Economy economy;
+
+    // オークションロガー
+    private static final MemoryLogger memoryLogger = new MemoryLogger();
+    private static final FileLogger fileLogger = new FileLogger();
+    private static final IAuctionLogger[] loggers = {memoryLogger, fileLogger};
 
     /**
      * プラグイン有効化処理
@@ -109,5 +118,22 @@ public final class YatchaYatcha extends JavaPlugin {
      */
     public static Economy getEconomy() {
         return economy;
+    }
+
+    /**
+     * オークションロガーを取得する
+     * @return オークションロガー
+     */
+    public static MemoryLogger getAuctionLogger() {
+        return memoryLogger;
+    }
+
+    /**
+     * ロギング
+     */
+    public static void log(AuctionInfo info) {
+        for (IAuctionLogger logger : loggers) {
+            logger.log(info);
+        }
     }
 }

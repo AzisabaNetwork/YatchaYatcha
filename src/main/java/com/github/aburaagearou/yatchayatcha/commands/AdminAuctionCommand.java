@@ -31,7 +31,7 @@ public class AdminAuctionCommand extends YYBaseCommand {
 
 	@Subcommand("start")
 	@Description("運営オークションを開始します。")
-	public void onAdminAuction(Player player, @Default("100") int start, @Default("") String debug) {
+	public void onStart(Player player, @Default("100") int start, @Default("") String debug) {
 		// 所持アイテムを競売に出品
 		ItemStack item = player.getInventory().getItemInMainHand();
 		if(item.getType() == Material.AIR) {
@@ -51,21 +51,21 @@ public class AdminAuctionCommand extends YYBaseCommand {
 
 	@Subcommand("end")
 	@Description("カウントダウンを待たずに運営オークションを終了します。")
-	public void onAdminAuctionEnd(CommandSender ignore) {
+	public void onEnd(CommandSender ignore) {
 		AdminAuction auction = AdminAuction.getInstance();
 		auction.end(false);
 	}
 
 	@Subcommand("cancel")
 	@Description("運営オークションを中止します。")
-	public void onAdminAuctionCancel(CommandSender ignore) {
+	public void onCancel(CommandSender ignore) {
 		AdminAuction auction = AdminAuction.getInstance();
 		auction.end(true);
 	}
 
 	@Subcommand("rule")
 	@Description("オークションルールを表示します。")
-	public void onAdminAuctionRule(Player sender) {
+	public void onRule(Player sender) {
 		for(String rule : YYConfigUtil.getRule()) {
 			Bukkit.getOnlinePlayers().forEach(player -> Utilities.sendColoredMessage(player, rule));
 		}
@@ -77,5 +77,11 @@ public class AdminAuctionCommand extends YYBaseCommand {
 		plugin.saveDefaultConfig();
 		plugin.reloadConfig();
 		sender.sendMessage("[YatchaYatcha] 設定を再読み込みしました。");
+	}
+
+	@Subcommand("log")
+	@Description("オークションログを表示します。")
+	public void onLog(CommandSender sender) {
+		YatchaYatcha.getAuctionLogger().getColoredLog().forEach(log -> Utilities.sendColoredMessage(sender, log));
 	}
 }

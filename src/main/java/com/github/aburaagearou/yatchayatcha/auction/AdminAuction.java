@@ -2,6 +2,7 @@ package com.github.aburaagearou.yatchayatcha.auction;
 
 import com.github.aburaagearou.yatchayatcha.YYConfigUtil;
 import com.github.aburaagearou.yatchayatcha.YatchaYatcha;
+import com.github.aburaagearou.yatchayatcha.log.AuctionInfo;
 import com.github.aburaagearou.yatchayatcha.utils.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -173,6 +174,9 @@ public class AdminAuction {
 		Utilities.broadcastColoredMessage("&r");
 		if(isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
 		else        Utilities.broadcastColoredMessage("&e=====================================");
+
+		// ロギング
+		YatchaYatcha.log(new AuctionInfo(bidPlayer, bidPrice, item));
 
 		// スコアボード使用終了
 		sidebar.hide();
