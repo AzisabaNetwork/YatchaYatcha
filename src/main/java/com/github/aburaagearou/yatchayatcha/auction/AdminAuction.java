@@ -94,6 +94,10 @@ public class AdminAuction {
 		Utilities.broadcastColoredMessage("&d&l開始価格： &e$" + bidPrice);
 		Utilities.broadcastColoredMessage("&r");
 		Utilities.broadcastColoredMessage("&e&l&n/bid (値段)&f コマンドで入札できます。");
+		if(this.isDebug) {
+			Utilities.broadcastColoredMessage("&r");
+			Utilities.broadcastColoredMessage("&e※デバッグモードのため景品、費用の収受は行われません。");
+		}
 		Utilities.broadcastColoredMessage("&r");
 		if(this.isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
 		else             Utilities.broadcastColoredMessage("&e=====================================");
@@ -153,8 +157,14 @@ public class AdminAuction {
 				Utilities.broadcastColoredMessage("&4~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			}
 			else {
-				YatchaYatcha.getEconomy().withdrawPlayer(bidPlayer, bidPrice);
-				bidPlayer.getInventory().addItem(item);
+				if(!isDebug) {
+					Utilities.broadcastColoredMessage("&r");
+					Utilities.broadcastColoredMessage("&e※デバッグモードのため景品、費用の収受は行われません。");
+				}
+				else {
+					YatchaYatcha.getEconomy().withdrawPlayer(bidPlayer, bidPrice);
+					bidPlayer.getInventory().addItem(item);
+				}
 			}
 		}
 		else {
