@@ -1,6 +1,10 @@
 # カウントダウンの秒数
 countdown: 20
 
+# 入札の最低価格
+bid-min-price-multi: 1.05 # 元値への倍率
+bid-min-price-add: 100 # 元値への加算値
+
 # ルール説明の定型文
 rule:
   - "&d&l～運営オークションのルール～"

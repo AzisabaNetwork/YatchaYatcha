@@ -82,6 +82,10 @@ public class AdminAuctionCommand extends YYBaseCommand {
 	@Subcommand("log")
 	@Description("オークションログを表示します。")
 	public void onLog(CommandSender sender) {
+		if(YatchaYatcha.getAuctionLogger().getColoredLog().isEmpty()) {
+			Utilities.sendColoredMessage(sender, "&a[YatchaYatcha] &bログはありません。");
+			return;
+		}
 		YatchaYatcha.getAuctionLogger().getColoredLog().forEach(log -> Utilities.sendColoredMessage(sender, log));
 	}
 }

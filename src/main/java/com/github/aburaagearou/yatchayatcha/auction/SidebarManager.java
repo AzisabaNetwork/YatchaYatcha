@@ -71,6 +71,14 @@ public class SidebarManager {
 	}
 
 	/**
+	 * 内容をクリア
+	 */
+	public void clear() {
+		this.lines.clear();
+		update();
+	}
+
+	/**
 	 * 表示対象プレイヤーを追加
 	 * @param players 表示対象プレイヤー
 	 */

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
  * 入札コマンド クラス
  * @author AburaAgeTarou
  */
+@Description("&a/bid &e(値段) &fで入札します。")
 public class BidCommand extends YYBaseCommand {
 
 	@Dependency

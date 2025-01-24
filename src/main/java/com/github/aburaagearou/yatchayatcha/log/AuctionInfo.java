@@ -37,7 +37,7 @@ public class AuctionInfo {
 		if(itemNameComp != null) {
 			itemName = PlainComponentSerializer.plain().serialize(itemNameComp);
 		}
-		return "落札者: " + bidder.getName() + " 価格: " + price + " 品物: " + itemName;
+		return "落札者: " + (bidder != null ? bidder.getName() : "無し") + " 価格: " + price + " 品物: " + itemName;
 	}
 
 	/**
@@ -50,6 +50,6 @@ public class AuctionInfo {
 		if(itemNameComp != null) {
 			itemName = PlainComponentSerializer.plain().serialize(itemNameComp);
 		}
-		return "&d落札者: &a" + bidder.getName() + " &d価格: &a$" + price + " &d品物: &r" + itemName;
+		return "&d落札者: &a" + (bidder != null ? bidder.getName() : "無し") + " &d価格: &a$" + price + " &d品物: &r" + itemName;
 	}
 }

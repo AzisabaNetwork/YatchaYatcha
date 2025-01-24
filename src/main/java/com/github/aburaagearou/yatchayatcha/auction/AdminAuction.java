@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -104,13 +106,17 @@ public class AdminAuction {
 		else             Utilities.broadcastColoredMessage("&e=====================================");
 
 		// サイドバー設定
+		double multi = YYConfigUtil.getBidMinPriceMulti();
+		int add = YYConfigUtil.getBidMinPriceAdd();
+		BigDecimal minPrice = new BigDecimal(((double) bidPrice) * multi).add(new BigDecimal(add)).setScale(0, RoundingMode.UP);
 		sidebar.addLine("&0");
 		sidebar.addLine("&7出品物: &f" + itemName);
 		sidebar.addLine("&1");
 		sidebar.addLine("&7最高入札者: &aなし");
 		sidebar.addLine("&7最高入札額: &e$" + bidPrice);
-		sidebar.addLine("&2");
+		sidebar.addLine("&e$" + (minPrice.intValue()+1) + "&fから入札可能");
 		sidebar.addLine("&3");
+		sidebar.addLine("&4");
 
 		// 表示
 		sidebar.showAll();
@@ -179,6 +185,7 @@ public class AdminAuction {
 		YatchaYatcha.log(new AuctionInfo(bidPlayer, bidPrice, item));
 
 		// スコアボード使用終了
+		sidebar.clear();
 		sidebar.hide();
 	}
 
@@ -195,6 +202,10 @@ public class AdminAuction {
 
 			@Override
 			public void run() {
+				if(!isAuctioning) {
+					cancelTask();
+					return;
+				}
 				if(count-- <= 0) {
 					end(false);
 					cancelTask();
@@ -211,12 +222,12 @@ public class AdminAuction {
 				if(count == 10) {
 					Utilities.broadcastColoredMessage("&a&l入札がない場合、あと&e&n" + count + "&a&l秒でオークションが終了します！");
 				}
-				else if(count <= 5) {
-					Utilities.broadcastColoredMessage("&e&n" + count + "...");
+				else if(count < 5) {
+					Utilities.broadcastColoredMessage("&e&n" + (count+1) + "...");
 				}
 
 				// サイドバー更新
-				sidebar.setLine(6, "&b落札まであと&e" + count + "秒");
+				sidebar.setLine(7, "&b落札まであと&e" + (count+1) + "秒");
 			}
 		}, 20L, 20L);
 	}
@@ -231,8 +242,13 @@ public class AdminAuction {
 			Utilities.sendColoredMessage(player, "&c現在オークションは行われていません。");
 			return;
 		}
-		if(bidPrice >= price) {
-			Utilities.sendColoredMessage(player, "&c入札額は &e&l$" + bidPrice + " &cより高くしてください。");
+
+		// 入札額チェック
+		double multi = YYConfigUtil.getBidMinPriceMulti();
+		int add = YYConfigUtil.getBidMinPriceAdd();
+		BigDecimal minPrice = new BigDecimal(((double) bidPrice) * multi).add(new BigDecimal(add)).setScale(0, RoundingMode.UP);
+		if(price < minPrice.intValue()) {
+			Utilities.sendColoredMessage(player, "&c入札額は &e&l$" + minPrice.intValue() + " &cより高くしてください。");
 			return;
 		}
 		if(YatchaYatcha.getEconomy().getBalance(player) < price) {
@@ -244,8 +260,10 @@ public class AdminAuction {
 		bidPrice = price;
 
 		// サイドバー更新
+		minPrice = new BigDecimal(((double) bidPrice) * multi).add(new BigDecimal(add)).setScale(0, RoundingMode.UP);
 		sidebar.setLine(3, "&7最高入札者: &a" + bidPlayer.getName());
 		sidebar.setLine(4, "&7最高入札額: &e$" + bidPrice);
+		sidebar.setLine(5, "&e$" + (minPrice.intValue()+1) + "&fから入札可能");
 
 		// カウントダウン開始
 		cancelTask();
