@@ -41,6 +41,9 @@ public final class YatchaYatcha extends JavaPlugin {
 
         getLogger().info("YatchaYatchaを有効化します。");
 
+        // コンフィグの初期化
+        saveDefaultConfig();
+
         // EconomyAPIの取得
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {

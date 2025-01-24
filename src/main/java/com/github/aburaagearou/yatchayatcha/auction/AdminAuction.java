@@ -1,5 +1,6 @@
 package com.github.aburaagearou.yatchayatcha.auction;
 
+import com.github.aburaagearou.yatchayatcha.YYConfigUtil;
 import com.github.aburaagearou.yatchayatcha.YatchaYatcha;
 import com.github.aburaagearou.yatchayatcha.utils.Utilities;
 import net.kyori.adventure.text.Component;
@@ -92,31 +93,86 @@ public class AdminAuction {
 		Bukkit.broadcast(itemNameText);
 		Utilities.broadcastColoredMessage("&d&l開始価格： &e$" + bidPrice);
 		Utilities.broadcastColoredMessage("&r");
+		Utilities.broadcastColoredMessage("&e&l&n/bid (値段)&f コマンドで入札できます。");
+		Utilities.broadcastColoredMessage("&r");
 		if(this.isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
 		else             Utilities.broadcastColoredMessage("&e=====================================");
 
 		// サイドバー設定
-		sidebar.addLine("&r");
+		sidebar.addLine("&0");
 		sidebar.addLine("&7出品物: &f" + itemName);
-		sidebar.addLine("&r");
+		sidebar.addLine("&1");
 		sidebar.addLine("&7最高入札者: &aなし");
 		sidebar.addLine("&7最高入札額: &e$" + bidPrice);
+		sidebar.addLine("&2");
+		sidebar.addLine("&3");
 
 		// 表示
 		sidebar.showAll();
 		sidebar.show();
 	}
 
+	/**
+	 * カウントダウンタスクをキャンセルする
+	 */
 	private void cancelTask() {
-		Bukkit.getScheduler().cancelTask(countdownTask.getTaskId());
+		if(countdownTask != null) {
+			Bukkit.getScheduler().cancelTask(countdownTask.getTaskId());
+		}
 	}
 
 	/**
 	 * オークションを終了する
 	 */
-	public void end(int countdown) {
+	public void end(boolean cancel) {
 		isAuctioning = false;
-		Utilities.broadcastColoredMessage("&a&l入札がない場合、あと&e&n" + countdown + "&a&l秒でオークションが終了します！");
+		if(isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
+		else        Utilities.broadcastColoredMessage("&e=====================================");
+		Utilities.broadcastColoredMessage("&r");
+
+		if(!cancel) {
+			Utilities.broadcastColoredMessage("&c&m-----&c&l&n 運営オークションが終了しました &c&m-----");
+		}
+		else {
+			Utilities.broadcastColoredMessage("&c&m-----&c&l&n 運営オークションが中止されました &c&m-----");
+			bidPlayer = null;
+		}
+
+		Utilities.broadcastColoredMessage("&r");
+		TextComponent itemNameText =
+				LegacyComponentSerializer.legacyAmpersand().deserialize("出品物  ： &r&f").append(itemName)
+						.hoverEvent(HoverEvent.showText(itemInfo));
+		Bukkit.broadcast(itemNameText.asComponent());
+		if(bidPlayer != null) {
+			Utilities.broadcastColoredMessage("&d&l落札者  ： &e" + bidPlayer.getName());
+			Utilities.broadcastColoredMessage("&d&l落札価格： &e$" + bidPrice);
+			if(YatchaYatcha.getEconomy().getBalance(bidPlayer) < bidPrice) {
+				Utilities.broadcastColoredMessage("&r");
+				Utilities.broadcastColoredMessage("&4~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+				Utilities.broadcastColoredMessage("&c&l落札者の所持金が足りないためキャンセルされました。");
+				Utilities.broadcastColoredMessage("&4~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			}
+			else {
+				YatchaYatcha.getEconomy().withdrawPlayer(bidPlayer, bidPrice);
+				bidPlayer.getInventory().addItem(item);
+			}
+		}
+		else {
+			Utilities.broadcastColoredMessage("&d&l落札者はいませんでした。");
+		}
+		Utilities.broadcastColoredMessage("&r");
+		if(isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
+		else        Utilities.broadcastColoredMessage("&e=====================================");
+
+		// スコアボード使用終了
+		sidebar.hide();
+	}
+
+	/**
+	 * カウントダウンによる自動終了
+	 */
+	public void countdown() {
+		int countdown = YYConfigUtil.getCountdown();
 
 		// カウントダウン
 		final int price = bidPrice;
@@ -126,47 +182,27 @@ public class AdminAuction {
 			@Override
 			public void run() {
 				if(count-- <= 0) {
-					if(isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
-					else        Utilities.broadcastColoredMessage("&e=====================================");
-					Utilities.broadcastColoredMessage("&r");
-					Utilities.broadcastColoredMessage("&c&m-----&c&l&n 運営オークションが終了しました &c&m-----");
-					Utilities.broadcastColoredMessage("&r");
-					TextComponent itemNameText =
-							LegacyComponentSerializer.legacyAmpersand().deserialize("出品物  ： &r&f").append(itemName)
-									.hoverEvent(HoverEvent.showText(itemInfo));
-					Bukkit.broadcast(itemNameText.asComponent());
-					if(bidPlayer != null) {
-						Utilities.broadcastColoredMessage("&d&l落札者  ： &e" + bidPlayer.getName());
-						Utilities.broadcastColoredMessage("&d&l落札価格： &e$" + bidPrice);
-						if(YatchaYatcha.getEconomy().getBalance(bidPlayer) < bidPrice) {
-							Utilities.broadcastColoredMessage("&4~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-							Utilities.broadcastColoredMessage("&c&l落札者の所持金が足りないためキャンセルされました。");
-							Utilities.broadcastColoredMessage("&4~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-						}
-						else {
-							YatchaYatcha.getEconomy().withdrawPlayer(bidPlayer, bidPrice);
-							bidPlayer.getInventory().addItem(item);
-						}
-					}
-					else {
-						Utilities.broadcastColoredMessage("&d&l落札者はいませんでした。");
-					}
-					Utilities.broadcastColoredMessage("&r");
-					if(isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
-					else             Utilities.broadcastColoredMessage("&e=====================================");
-
-					// スコアボード使用終了
-					sidebar.hide();
+					end(false);
 					cancelTask();
 					return;
 				}
 
+				// 入札があった場合
 				if(price != bidPrice) {
 					cancelTask();
 					return;
 				}
 
-				Utilities.broadcastColoredMessage("&e&n" + count + "...");
+				// 10秒前
+				if(count == 10) {
+					Utilities.broadcastColoredMessage("&a&l入札がない場合、あと&e&n" + count + "&a&l秒でオークションが終了します！");
+				}
+				else if(count <= 5) {
+					Utilities.broadcastColoredMessage("&e&n" + count + "...");
+				}
+
+				// サイドバー更新
+				sidebar.setLine(6, "&b落札まであと&e" + count + "秒");
 			}
 		}, 20L, 20L);
 	}
@@ -196,5 +232,9 @@ public class AdminAuction {
 		// サイドバー更新
 		sidebar.setLine(3, "&7最高入札者: &a" + bidPlayer.getName());
 		sidebar.setLine(4, "&7最高入札額: &e$" + bidPrice);
+
+		// カウントダウン開始
+		cancelTask();
+		countdown();
 	}
 }

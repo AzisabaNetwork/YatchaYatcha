@@ -2,9 +2,11 @@ package com.github.aburaagearou.yatchayatcha.commands;
 
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
+import com.github.aburaagearou.yatchayatcha.YYConfigUtil;
 import com.github.aburaagearou.yatchayatcha.YatchaYatcha;
 import com.github.aburaagearou.yatchayatcha.auction.AdminAuction;
 import com.github.aburaagearou.yatchayatcha.utils.Utilities;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,7 +25,7 @@ public class AdminAuctionCommand extends YYBaseCommand {
 
 	@Default
 	@HelpCommand
-	public void onHelp(CommandSender sender, CommandHelp help) {
+	public void onHelp(CommandSender ignore, CommandHelp help) {
 		help.showHelp();
 	}
 
@@ -48,15 +50,32 @@ public class AdminAuctionCommand extends YYBaseCommand {
 	}
 
 	@Subcommand("end")
-	@Description("運営オークションを終了します。")
-	public void onAdminAuctionEnd(Player player, @Default("5") int countdown) {
+	@Description("カウントダウンを待たずに運営オークションを終了します。")
+	public void onAdminAuctionEnd(CommandSender ignore) {
 		AdminAuction auction = AdminAuction.getInstance();
-		auction.end(countdown);
+		auction.end(false);
 	}
 
 	@Subcommand("cancel")
 	@Description("運営オークションを中止します。")
-	public void onAdminAuctionCancel(Player player) {
+	public void onAdminAuctionCancel(CommandSender ignore) {
+		AdminAuction auction = AdminAuction.getInstance();
+		auction.end(true);
+	}
 
+	@Subcommand("rule")
+	@Description("オークションルールを表示します。")
+	public void onAdminAuctionRule(Player sender) {
+		for(String rule : YYConfigUtil.getRule()) {
+			Bukkit.getOnlinePlayers().forEach(player -> Utilities.sendColoredMessage(player, rule));
+		}
+	}
+
+	@Subcommand("reloadconfig")
+	@Description("コンフィグをリロードします。")
+	public void onReloadConfig(CommandSender sender) {
+		plugin.saveDefaultConfig();
+		plugin.reloadConfig();
+		sender.sendMessage("[YatchaYatcha] 設定を再読み込みしました。");
 	}
 }
