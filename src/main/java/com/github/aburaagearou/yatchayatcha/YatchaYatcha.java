@@ -4,13 +4,13 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.MessageKeys;
 import co.aikar.commands.MessageType;
 import co.aikar.commands.PaperCommandManager;
+import com.github.aburaagearou.yatchayatcha.auction.AdminAuction;
 import com.github.aburaagearou.yatchayatcha.commands.AdminAuctionCommand;
 import com.github.aburaagearou.yatchayatcha.commands.BidCommand;
 import com.github.aburaagearou.yatchayatcha.log.AuctionInfo;
 import com.github.aburaagearou.yatchayatcha.log.FileLogger;
 import com.github.aburaagearou.yatchayatcha.log.IAuctionLogger;
 import com.github.aburaagearou.yatchayatcha.log.MemoryLogger;
-import com.github.ucchyocean.lc.channel.Channel;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -100,6 +100,9 @@ public final class YatchaYatcha extends JavaPlugin {
     @Override
     public void onDisable() {
         getLogger().info("YatchaYatchaを無効化します。");
+
+        // オークションの中断
+        AdminAuction.getInstance().end(true);
 
         // コマンドの登録解除
         commands.forEach(manager::unregisterCommand);

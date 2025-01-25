@@ -6,7 +6,6 @@ import com.github.aburaagearou.yatchayatcha.YYConfigUtil;
 import com.github.aburaagearou.yatchayatcha.YatchaYatcha;
 import com.github.aburaagearou.yatchayatcha.auction.AdminAuction;
 import com.github.aburaagearou.yatchayatcha.utils.Utilities;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -67,15 +66,14 @@ public class AdminAuctionCommand extends YYBaseCommand {
 	@Description("オークションルールを表示します。")
 	public void onRule(Player sender) {
 		for(String rule : YYConfigUtil.getRule()) {
-			Bukkit.getOnlinePlayers().forEach(player -> Utilities.sendColoredMessage(player, rule));
+			Utilities.broadcastColoredMessage(rule);
 		}
 	}
 
 	@Subcommand("reloadconfig")
 	@Description("コンフィグをリロードします。")
 	public void onReloadConfig(CommandSender sender) {
-		plugin.saveDefaultConfig();
-		plugin.reloadConfig();
+		YYConfigUtil.reload();
 		sender.sendMessage("[YatchaYatcha] 設定を再読み込みしました。");
 	}
 

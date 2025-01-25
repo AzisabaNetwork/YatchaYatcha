@@ -14,3 +14,21 @@ rule:
   - "&aさ&bん&cぷ&dる&eぷ&1る&2ぷ&3る"
   - "同じように行を増やせば説明を増やせるよ"
   - "でもTwitter民は3行までの文章しか読めないから配慮してあげてね"
+
+# 効果音
+sound-effects:
+
+  # オークション開始
+  start: block_note_block_basedrum-1-0.7-0,block_bell_use-1-1.5-0,block_bell_use-1-1.65-10,block_bell_use-1-1.65-12,block_bell_use-1-1.5-25,block_bell_use-1-1.65-27,block_bell_use-1-1.5-40,block_bell_use-1-1.65-42
+
+  # 入札（自分）
+  bid-self: entity_villager_yes-1-1-0
+
+  # 入札（他人）
+  bid-rival: entity_pillager_celebrate-1-1.2-0
+
+  # カウントダウン
+  countdown: entity_ender_dragon_hurt-1-1.4-0
+
+  # 落札
+  success: ui_toast_challenge_complete-1-1-0,block_bell_use-1-1.9-0,block_bell_use-1-1.8-4,block_bell_use-1-1.9-8,block_bell_use-1-1.8-12,block_bell_use-1-1.9-16,,block_bell_use-1-1.8-20,block_bell_use-1-1.9-24,block_bell_use-1-1.8-28,

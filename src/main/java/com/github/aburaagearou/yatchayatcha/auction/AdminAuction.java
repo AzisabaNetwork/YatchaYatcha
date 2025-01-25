@@ -121,6 +121,9 @@ public class AdminAuction {
 		// 表示
 		sidebar.showAll();
 		sidebar.show();
+
+		// 効果音
+		Utilities.playSound(YYConfigUtil.getSoundSetting(YYConfigUtil.SE_START));
 	}
 
 	/**
@@ -133,9 +136,54 @@ public class AdminAuction {
 	}
 
 	/**
+	 * カウントダウンによる自動終了
+	 */
+	public void countdown() {
+		int countdown = YYConfigUtil.getCountdown();
+
+		// カウントダウン
+		final int price = bidPrice;
+		countdownTask = Bukkit.getScheduler().runTaskTimer(YatchaYatcha.getInstance(), new Runnable() {
+			int count = countdown;
+
+			@Override
+			public void run() {
+				if(!isAuctioning) {
+					cancelTask();
+					return;
+				}
+				if(count-- <= 0) {
+					end(false);
+					cancelTask();
+					return;
+				}
+
+				// 入札があった場合
+				if(price != bidPrice) {
+					cancelTask();
+					return;
+				}
+
+				// 10秒前
+				if(count == 10) {
+					Utilities.broadcastColoredMessage("&a&l入札がない場合、あと&e&n" + count + "&a&l秒でオークションが終了します！");
+				}
+				else if(count < 5) {
+					Utilities.playSound(YYConfigUtil.getSoundSetting(YYConfigUtil.SE_COUNTDOWN));
+					Utilities.broadcastColoredMessage("&e&n" + (count+1) + "...");
+				}
+
+				// サイドバー更新
+				sidebar.setLine(7, "&b落札まであと&e" + (count+1) + "秒");
+			}
+		}, 20L, 20L);
+	}
+
+	/**
 	 * オークションを終了する
 	 */
 	public void end(boolean cancel) {
+		if(!isAuctioning) return;
 		isAuctioning = false;
 		if(isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
 		else        Utilities.broadcastColoredMessage("&e=====================================");
@@ -181,55 +229,15 @@ public class AdminAuction {
 		if(isDebug) Utilities.broadcastColoredMessage("&c!!!!!!!!!!!!!!!!Debug!!!!!!!!!!!!!!!!");
 		else        Utilities.broadcastColoredMessage("&e=====================================");
 
-		// ロギング
-		YatchaYatcha.log(new AuctionInfo(bidPlayer, bidPrice, item));
-
 		// スコアボード使用終了
 		sidebar.clear();
 		sidebar.hide();
-	}
 
-	/**
-	 * カウントダウンによる自動終了
-	 */
-	public void countdown() {
-		int countdown = YYConfigUtil.getCountdown();
+		// 効果音
+		Utilities.playSound(YYConfigUtil.getSoundSetting(YYConfigUtil.SE_SUCCESS));
 
-		// カウントダウン
-		final int price = bidPrice;
-		countdownTask = Bukkit.getScheduler().runTaskTimer(YatchaYatcha.getInstance(), new Runnable() {
-			int count = countdown;
-
-			@Override
-			public void run() {
-				if(!isAuctioning) {
-					cancelTask();
-					return;
-				}
-				if(count-- <= 0) {
-					end(false);
-					cancelTask();
-					return;
-				}
-
-				// 入札があった場合
-				if(price != bidPrice) {
-					cancelTask();
-					return;
-				}
-
-				// 10秒前
-				if(count == 10) {
-					Utilities.broadcastColoredMessage("&a&l入札がない場合、あと&e&n" + count + "&a&l秒でオークションが終了します！");
-				}
-				else if(count < 5) {
-					Utilities.broadcastColoredMessage("&e&n" + (count+1) + "...");
-				}
-
-				// サイドバー更新
-				sidebar.setLine(7, "&b落札まであと&e" + (count+1) + "秒");
-			}
-		}, 20L, 20L);
+		// ロギング
+		YatchaYatcha.log(new AuctionInfo(bidPlayer, bidPrice, item));
 	}
 
 	/**
@@ -264,6 +272,10 @@ public class AdminAuction {
 		sidebar.setLine(3, "&7最高入札者: &a" + bidPlayer.getName());
 		sidebar.setLine(4, "&7最高入札額: &e$" + bidPrice);
 		sidebar.setLine(5, "&e$" + (minPrice.intValue()+1) + "&fから入札可能");
+
+		// 効果音
+		Utilities.playSound(YYConfigUtil.getSoundSetting(YYConfigUtil.SE_BID_SELF), bidPlayer);
+		Utilities.playSound(YYConfigUtil.getSoundSetting(YYConfigUtil.SE_BID_RIVAL), Bukkit.getOnlinePlayers().stream().filter(p -> !p.equals(bidPlayer)).toArray(Player[]::new));
 
 		// カウントダウン開始
 		cancelTask();
